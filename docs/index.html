@@ -338,9 +338,9 @@ locations-service:
 
 **What’s new here?**
 
-1. [volumes](https://docs.docker.com/engine/tutorials/dockervolumes/) - mounts a directory into a container so that you can make changes to the code without having to build a new image.
+1. [volumes](https://docs.docker.com/engine/tutorials/dockervolumes/) - mount directories into a container so that you can make changes to the code without having to build a new image.
 1. [depends_on](https://docs.docker.com/compose/compose-file/#depends_on) - used to start services in a specific order.
-1. [links](https://docs.docker.com/compose/compose-file/#links) - connects services together.
+1. [links](https://docs.docker.com/compose/compose-file/#links) - connect services together.
 
 ---
 
@@ -361,10 +361,10 @@ $ docker-compose up -d
 Migrate and seed:
 
 ```sh
-$ docker-compose run locations-service \
-      knex migrate:latest --env development --knexfile knexfile.js
-$ docker-compose run locations-service \
-      knex seed:run --env development --knexfile knexfile.js
+$ docker-compose run locations-service knex migrate:latest \
+          --env development --knexfile knexfile.js
+$ docker-compose run locations-service knex seed:run \
+          --env development --knexfile knexfile.js
 ```
 
 Test:
