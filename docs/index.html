@@ -320,13 +320,14 @@ locations-service:
   container_name: locations-service
   build: .
   volumes:
-    - '.:/src/app'
-    - './package.json:/src/package.json'
+    - './app:/usr/src/app'
+    - './package.json:/usr/src/package.json'
+    - './knexfile.js:/usr/src/knexfile.js'
   ports:
-    - '80:1337'
+    - '1337:1337'
   environment:
-    - DATABASE_URL=postgres://admin:admin@locations:5432/_locations_dev
-    - DATABASE_TEST_URL=postgres://admin:admin@locations:5432/_locations_test
+    - DATABASE_URL=postgres://admin:admin@locations-db:5432/locations_dev
+    - DATABASE_TEST_URL=postgres://admin:admin@locations-db:5432/locations_test
     - NODE_ENV=development
   depends_on:
     locations-db:
@@ -345,8 +346,6 @@ locations-service:
 
 ### Build and Run
 
-WIP
-
 Build the images:
 
 ```sh
@@ -359,7 +358,7 @@ Run the containers:
 $ docker-compose up -d
 ```
 
-Apply the migrations:
+Migrate and seed:
 
 ```sh
 $ docker-compose run locations-service \
@@ -368,14 +367,42 @@ $ docker-compose run locations-service \
       knex seed:run --env development --knexfile knexfile.js
 ```
 
-docker-compose run web env
-docker-compose stop
+Test:
+
+```sh
+$ docker-compose run locations-service npm test
+```
 
 ---
 
 ### Workflow
 
-WIP
+Some commands...
+
+**Check env variables:**
+
+```sh
+$ docker-compose run locations-service env
+```
+
+**Force new build**:
+
+```sh
+$ docker-compose build --no-cache
+```
+
+**Stop running containers**:
+
+```sh
+$ docker-compose stop
+```
+
+**Enter psql**:
+
+```sh
+$ docker exec -ti locations-db psql -U admin -W
+```
+
 
 ---
 
@@ -389,6 +416,7 @@ What's next?
 
 1. [Slides](http://mherman.org/docker-workshop)
 1. [Project Repo](https://github.com/mjhea0/docker-workshop)
+1. [How to Build 12 Factor Microservices on Docker - Part 1](https://www.packtpub.com/books/content/how-to-build-12-factor-design-microservices-on-docker-part-1)
 1. [Docker Cheat Sheet](https://github.com/wsargent/docker-cheat-sheet)
 
 --
@@ -398,6 +426,7 @@ What's next?
 1. [Developing and Testing Microservices With Docker](http://mherman.org/blog/2017/04/18/developing-and-testing-microservices-with-docker)
 1. [Developing Microservices - Node, React, and Docker](http://mherman.org/blog/2017/05/11/developing-microservices-node-react-docker)
 1. [Microservices with Docker, Flask, and React](http://testdriven.io/) (In Denver/Boulder? Come here me talk about this project on July 11th at [Boulder Python](https://www.meetup.com/BoulderPython/events/239106652/))
+1. [Developing React with Docker](http://mherman.org/node-workshop/slides/react-docker)
 
 --
 

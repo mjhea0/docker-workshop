@@ -17,8 +17,9 @@ services:
     container_name: locations-service
     build: .
     volumes:
-      - '.:/src/app'
-      - './package.json:/src/package.json'
+      - './app:/usr/src/app'
+      - './package.json:/usr/src/package.json'
+      - './knexfile.js:/usr/src/knexfile.js'
     ports:
       - '1337:1337'
     environment:
