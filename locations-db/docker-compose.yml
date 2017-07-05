@@ -1,0 +1,32 @@
+version: '2.1'
+
+services:
+
+  locations-db:
+    container_name: locations-db
+    build: ./app/db
+    ports:
+      - '5434:5432'
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    healthcheck:
+      test: exit 0
+
+  locations-service:
+    container_name: locations-service
+    build: .
+    volumes:
+      - '.:/src/app'
+      - './package.json:/src/package.json'
+    ports:
+      - '1337:1337'
+    environment:
+      - DATABASE_URL=postgres://admin:admin@locations-db:5432/locations_dev
+      - DATABASE_TEST_URL=postgres://admin:admin@locations-db:5432/locations_test
+      - NODE_ENV=development
+    depends_on:
+      locations-db:
+        condition: service_healthy
+    links:
+      - locations-db

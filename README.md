@@ -2,11 +2,7 @@
 
 Intro to Docker
 
-http://mherman.org/docker-workshop
+## Links
 
-
-
-Resources:
-
-https://github.com/wsargent/docker-cheat-sheet
-http://mherman.org/blog/2017/05/11/developing-microservices-node-react-docker/
+1. Slides - http://mherman.org/docker-workshop
+1. Project - https://github.com/mjhea0/docker-workshop

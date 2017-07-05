@@ -13,6 +13,7 @@ RUN npm install
 
 # add files and folders to the container
 ADD /app /usr/src/app
+ADD knexfile.js /usr/src/knexfile.js
 
 # start app
 CMD ["npm", "start"]

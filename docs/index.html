@@ -40,11 +40,14 @@ class: center, middle
 
 ---
 
-## Agenda
+### Agenda
 
 --
 
 ##### (1) About Me
+
+--
+
 ##### (2) Objectives
 
 --
@@ -59,7 +62,18 @@ class: center, middle
 
 ##### (4) Practice
 
-1.
+1. Dockerfile Basics
+1. Build an Image
+1. Run the Image
+1. Docker Compose Basics
+1. Database Service
+1. Node Service
+1. Build and Run
+1. Workflow
+
+--
+
+##### (5) Next Steps
 
 ---
 
@@ -88,7 +102,7 @@ michael.herman
 
 ---
 
-## Objectives
+### Objectives
 
 By the end of this talk, you should be able to:
 
@@ -99,12 +113,12 @@ By the end of this talk, you should be able to:
 1. Create a container from an image
 1. Work with a Node app running inside a container
 1. Simply your development workflow with Docker Compose
-1. Pass environment variables to an image at both build and run times
+1. Pass environment variables to a running container
 1. Utilize volumes to mount code into a container
 
 ---
 
-## What is Docker?
+### What is Docker?
 
 --
 
@@ -112,7 +126,7 @@ By the end of this talk, you should be able to:
 
 --
 
-1. **Lightweight** - uses the host computer's processes
+1. **Lightweight** - uses the host computer's processes (check out [Containers are not VMs](https://blog.docker.com/2016/03/containers-are-not-vms/))
 1. **VCS** - Version control system for infrastructure
 1. **Distribution** - Easily distribute/recreate your entire development environment
 1. **Build once, run anywhere** (aka, The Holy Grail!) - no more environment-specific bugs
@@ -123,7 +137,7 @@ By the end of this talk, you should be able to:
 
 ---
 
-## Install Docker
+### Install Docker
 
 https://www.docker.com/community-edition
 
@@ -134,15 +148,17 @@ Docker version 17.06.0-ce, build 02c1d87
 
 --
 
-Hello, World:
+Obligatory 'Hello, World':
 
 ```sh
 $ docker run hello-world
 ```
 
+<img src="images/hello-world.png" alt="hello world" style="width:150px;">
+
 ---
 
-## Concepts
+### Concepts
 
 https://docs.docker.com/engine/docker-overview/
 
@@ -164,16 +180,9 @@ https://docs.docker.com/engine/docker-overview/
 
 ---
 
-## Dockerfile
+### Dockerfile Basics
 
-```sh
-$ git clone https://github.com/mjhea0/docker-workshop
-$ cd docker-workshop && cd locations
-```
-
---
-
-Dockerfile:
+https://github.com/mjhea0/docker-workshop/blob/master/locations/Dockerfile:
 
 ```sh
 FROM node:latest
@@ -202,7 +211,7 @@ Be sure to take advantage of Docker’s layered [caching](https://docs.docker.co
 
 ---
 
-## Build an Image
+### Build an Image
 
 Within the "locations" directory, run:
 
@@ -211,6 +220,8 @@ $ docker build -t "locations" .
 ```
 
 --
+
+**What's happening?**
 
 Docker pulls down the base [Node](https://hub.docker.com/_/node/) image found on [Docker Hub](https://hub.docker.com/), an [image registry](https://docs.docker.com/registry/) (it's like GitHub for Docker Images). From there, each line, called a [layer](https://docs.docker.com/glossary/?term=layer), from the Dockerfile is run and added to the new image.
 
@@ -230,7 +241,7 @@ $ docker build -t "locations:v2" .
 
 ---
 
-## Run the Image
+### Run the Image
 
 To run the `locations` image:
 
@@ -241,22 +252,17 @@ $ docker run -d -p 80:1337 locations
 - `-p` connects port 1337 of the Docker container to port 80 of your machine
 - `-d` runs the container in the background
 
---
-
-To view all running containers:
-
-```sh
-$ docker ps
-```
+> **NOTE:** Instead of localhost (127.0.0.1), this could also be the IP associated with Docker Machine - `docker-machine ip MACHINE_NAME`.
 
 --
 
 Helpful commands for running containers:
 
+1. View: `docker ps`
 1. Stop: `docker stop CONTAINER_ID`
-1. View the logs: `docker logs CONTAINER_ID`
+1. View the logs: `docker logs CONTAINER_ID -f`
 1. Enter bash: `docker exec -it CONTAINER_ID bash`
-1. Run tests: `docker exec -it 12b9b5f9dff8 npm test`
+1. Run tests: `docker exec -it CONTAINER_ID npm test`
 
 --
 
@@ -268,12 +274,135 @@ $ docker run -d -p 80:1338 -e PORT=1338 locations
 
 ---
 
-## Docker Compose
+### Docker Compose Basics
 
-Take note of the *docker-compose.yml* within "locations-db":
+https://github.com/mjhea0/docker-workshop/blob/master/locations-db/docker-compose.yml
 
+--
 
-This file is used by [Docker Compose](https://docs.docker.com/compose/) to link multiple services together. With one command it will spin up all the containers we need and enable them to communicate with one another (as needed).
+This file is used by [Docker Compose](https://docs.docker.com/compose/) to link multiple services together. With one command it will spin up the defined services and enable them to communicate with one another.
+
+https://stackoverflow.com/questions/37966552/what-is-the-difference-between-docker-and-docker-compose
+
+<br>
+
+<img src="images/docker-compose.png" alt="docker compose logo" style="width:200px;">
+
+---
+
+### Database Service
+
+From *docker-compose.yml*:
+
+```yaml
+locations-db:
+  container_name: locations-db
+  build: ./app/db
+  ports:
+    - '5433:5432'
+  environment:
+    - POSTGRES_USER=admin
+    - POSTGRES_PASSWORD=admin
+  healthcheck:
+    test: exit 0
+```
+
+Here, we create a new container called `locations-db`, from the Dockerfile found in "locations-db/app/db". We also add environment variables, expose ports, and send an exit code of `0` once it is successfully up and running - which will be used by other services.
+
+---
+
+### Node Service
+
+From *docker-compose.yml*:
+
+```yaml
+locations-service:
+  container_name: locations-service
+  build: .
+  volumes:
+    - '.:/src/app'
+    - './package.json:/src/package.json'
+  ports:
+    - '80:1337'
+  environment:
+    - DATABASE_URL=postgres://admin:admin@locations:5432/_locations_dev
+    - DATABASE_TEST_URL=postgres://admin:admin@locations:5432/_locations_test
+    - NODE_ENV=development
+  depends_on:
+    locations-db:
+      condition: service_healthy
+  links:
+    - locations-db
+```
+
+**What’s new here?**
+
+1. [volumes](https://docs.docker.com/engine/tutorials/dockervolumes/) - mounts a directory into a container so that you can make changes to the code without having to build a new image.
+1. [depends_on](https://docs.docker.com/compose/compose-file/#depends_on) - used to start services in a specific order.
+1. [links](https://docs.docker.com/compose/compose-file/#links) - connects services together.
+
+---
+
+### Build and Run
+
+WIP
+
+Build the images:
+
+```sh
+$ docker-compose build
+```
+
+Run the containers:
+
+```sh
+$ docker-compose up -d
+```
+
+Apply the migrations:
+
+```sh
+$ docker-compose run locations-service \
+      knex migrate:latest --env development --knexfile knexfile.js
+$ docker-compose run locations-service \
+      knex seed:run --env development --knexfile knexfile.js
+```
+
+docker-compose run web env
+docker-compose stop
+
+---
+
+### Workflow
+
+WIP
+
+---
+
+### That's it!
+
+What's next?
+
+--
+
+**Resources**:
+
+1. [Slides](http://mherman.org/docker-workshop)
+1. [Project Repo](https://github.com/mjhea0/docker-workshop)
+1. [Docker Cheat Sheet](https://github.com/wsargent/docker-cheat-sheet)
+
+--
+
+**Bigger examples**:
+
+1. [Developing and Testing Microservices With Docker](http://mherman.org/blog/2017/04/18/developing-and-testing-microservices-with-docker)
+1. [Developing Microservices - Node, React, and Docker](http://mherman.org/blog/2017/05/11/developing-microservices-node-react-docker)
+1. [Microservices with Docker, Flask, and React](http://testdriven.io/) (In Denver/Boulder? Come here me talk about this project on July 11th at [Boulder Python](https://www.meetup.com/BoulderPython/events/239106652/))
+
+--
+
+Questions?
+
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">

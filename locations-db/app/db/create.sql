@@ -1,2 +1,2 @@
-CREATE DATABASE docker_workshop_locations_dev;
-CREATE DATABASE docker_workshop_locations_test;
+CREATE DATABASE locations_dev;
+CREATE DATABASE locations_test;
