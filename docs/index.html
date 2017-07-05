@@ -47,6 +47,20 @@ class: center, middle
 ##### (1) About Me
 ##### (2) Objectives
 
+--
+
+##### (3) Theory
+
+1. What is Docker?
+1. Install Docker
+1. Concepts
+
+--
+
+##### (4) Practice
+
+1.
+
 ---
 
 ## About Michael
@@ -76,10 +90,190 @@ michael.herman
 
 ## Objectives
 
-By the end of this talk you should be able to:
+By the end of this talk, you should be able to:
 
-1. foo
-1. bar
+1. Describe what Docker is and why it's useful
+1. Install Docker Community Edition for Mac
+1. Describe the relationship between a Dockerfile, image, and container
+1. Build an image from a Dockerfile
+1. Create a container from an image
+1. Work with a Node app running inside a container
+1. Simply your development workflow with Docker Compose
+1. Pass environment variables to an image at both build and run times
+1. Utilize volumes to mount code into a container
+
+---
+
+## What is Docker?
+
+--
+
+[Docker](https://www.docker.com/) is a containerization tool used for spinning up isolated, reproducible application environments.
+
+--
+
+1. **Lightweight** - uses the host computer's processes
+1. **VCS** - Version control system for infrastructure
+1. **Distribution** - Easily distribute/recreate your entire development environment
+1. **Build once, run anywhere** (aka, The Holy Grail!) - no more environment-specific bugs
+
+<br>
+
+<img src="images/docker-what-is-it.png" alt="docker - what is it?" style="width:150px;">
+
+---
+
+## Install Docker
+
+https://www.docker.com/community-edition
+
+```sh
+$ docker -v
+Docker version 17.06.0-ce, build 02c1d87
+```
+
+--
+
+Hello, World:
+
+```sh
+$ docker run hello-world
+```
+
+---
+
+## Concepts
+
+https://docs.docker.com/engine/docker-overview/
+
+- **[Dockerfiles](https://docs.docker.com/glossary/?term=Dockerfile)** - scripts with a set of instructions used to create an *image*.
+
+--
+
+- **[Images](https://docs.docker.com/glossary/?term=image)** - are used to build and save snapshots (the state) of an environment. It's blueprint for a *container*.
+
+  > **NOTE:** You can think of an image as a virtual operating system, but smaller and more efficient.
+
+--
+
+- **[Container](https://docs.docker.com/glossary/?term=container)** is an instantiated, live *image* that runs a collection of processes.
+
+<br>
+
+<img src="images/docker-concepts.png" alt="docker concepts">
+
+---
+
+## Dockerfile
+
+```sh
+$ git clone https://github.com/mjhea0/docker-workshop
+$ cd docker-workshop && cd locations
+```
+
+--
+
+Dockerfile:
+
+```sh
+FROM node:latest
+
+# set working directory
+RUN mkdir /usr/src/app
+WORKDIR /usr/src
+
+# add `/usr/src/node_modules/.bin` to $PATH
+ENV PATH /usr/src/node_modules/.bin:$PATH
+
+# install and cache app dependencies
+ADD package.json /usr/src/package.json
+RUN npm install
+
+# add files and folders to the container
+ADD /app /usr/src/app
+
+# start app
+CMD ["npm", "start"]
+```
+
+--
+
+Be sure to take advantage of Docker’s layered [caching](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/#build-cache) system, to speed up build times, by adding the *package.json* and installing the dependencies **before** adding the app’s source files.
+
+---
+
+## Build an Image
+
+Within the "locations" directory, run:
+
+```sh
+$ docker build -t "locations" .
+```
+
+--
+
+Docker pulls down the base [Node](https://hub.docker.com/_/node/) image found on [Docker Hub](https://hub.docker.com/), an [image registry](https://docs.docker.com/registry/) (it's like GitHub for Docker Images). From there, each line, called a [layer](https://docs.docker.com/glossary/?term=layer), from the Dockerfile is run and added to the new image.
+
+> **NOTE:** The first time you build an image, it will take some time. Subsequent builds should be *much* faster since layers are cached locally - only layers that change will be updated.
+
+--
+
+Run `docker images` to view the newly created image.
+
+--
+
+You can also add a version to the tag name:
+
+```sh
+$ docker build -t "locations:v2" .
+```
+
+---
+
+## Run the Image
+
+To run the `locations` image:
+
+```sh
+$ docker run -d -p 80:1337 locations
+```
+
+- `-p` connects port 1337 of the Docker container to port 80 of your machine
+- `-d` runs the container in the background
+
+--
+
+To view all running containers:
+
+```sh
+$ docker ps
+```
+
+--
+
+Helpful commands for running containers:
+
+1. Stop: `docker stop CONTAINER_ID`
+1. View the logs: `docker logs CONTAINER_ID`
+1. Enter bash: `docker exec -it CONTAINER_ID bash`
+1. Run tests: `docker exec -it 12b9b5f9dff8 npm test`
+
+--
+
+To pass an environment variable at run-time:
+
+```sh
+$ docker run -d -p 80:1338 -e PORT=1338 locations
+```
+
+---
+
+## Docker Compose
+
+Take note of the *docker-compose.yml* within "locations-db":
+
+
+This file is used by [Docker Compose](https://docs.docker.com/compose/) to link multiple services together. With one command it will spin up all the containers we need and enable them to communicate with one another (as needed).
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
