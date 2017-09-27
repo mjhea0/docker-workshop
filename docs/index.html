@@ -31,7 +31,7 @@
 class: center, middle
 
 # Docker Workshop<br>What's under the Hood?
-[Fitter](https://www.youtube.com/watch?v=HimvFbossU8). [Happier](https://www.youtube.com/watch?v=My10FLH5DT0). [More productive](https://www.youtube.com/watch?v=9ORllD7fA6I).
+[Fitter](https://www.youtube.com/watch?v=hs64rB0cLNw). [Happier](https://www.youtube.com/watch?v=My10FLH5DT0). [More productive](https://www.youtube.com/watch?v=9ORllD7fA6I).
 <br><br>
 <img src="images/docker.png" alt="docker logo" style="width:100px;padding-bottom:7px;">
 <br><br><br>
@@ -87,18 +87,19 @@ michael.herman
 
 #### Day Job:
 
-[Galvanize](http://www.galvanize.com/) (since May 2015)...
-
-1. ~~Lead Instructor Full Stack~~
-1. ~~Curriculum Developer~~
-1. Senior Software Engineer
+- Software Engineer at [ClickFox](https://www.clickfox.com/) as of October 2017
+- Instructor and Software Enginner at [Galvanize](http://www.galvanize.com/) from May 2015 to September 2017
 
 --
 
 #### Also:
 
-1. Co-founder/author of [Real Python](https://realpython.com)
-1. 😍 - [tech writing](http://mherman.org), [open source](http://github.com/mjhea0), [financial models](http://www.starterfinancialmodel.com/), [radiohead](http://radiohead.com/), [chilling](images/me.jpg)
+- Co-founder/author of [Real Python](https://realpython.com)
+- 😍 - [tech writing](http://mherman.org), [open source](http://github.com/mjhea0), [financial models](http://www.starterfinancialmodel.com/), [radiohead](http://radiohead.com/), [chilling](images/me.jpg)
+
+<br>
+
+<img src="images/rp_logo_color_small.png" alt="real python logo" style="width:175px;">
 
 ---
 
@@ -107,14 +108,18 @@ michael.herman
 By the end of this talk, you should be able to:
 
 1. Describe what Docker is and why it's useful
-1. Install Docker Community Edition for Mac
 1. Describe the relationship between a Dockerfile, image, and container
+1. Simplify your development workflow with Docker Compose
+1. Install Docker Community Edition for Mac
 1. Build an image from a Dockerfile
 1. Create a container from an image
 1. Work with a Node app running inside a container
-1. Simply your development workflow with Docker Compose
 1. Pass environment variables to a running container
 1. Utilize volumes to mount code into a container
+
+--
+
+*4 through 9 are applicable only if you brought your computer along `&&` are coding along.*
 
 ---
 
@@ -128,7 +133,7 @@ By the end of this talk, you should be able to:
 
 1. **Lightweight** - uses the host computer's processes (check out [Containers are not VMs](https://blog.docker.com/2016/03/containers-are-not-vms/))
 1. **VCS** - Version control system for infrastructure
-1. **Distribution** - Easily distribute/recreate your entire development environment
+1. **Distribution** - Easily distribute and recreate your entire development environment
 1. **Build once, run anywhere** (aka, The Holy Grail!) - no more environment-specific bugs
 
 <br>
@@ -143,7 +148,7 @@ https://www.docker.com/community-edition
 
 ```sh
 $ docker -v
-Docker version 17.06.0-ce, build 02c1d87
+Docker version 17.06.2-ce, build cec0b72
 ```
 
 --
@@ -292,7 +297,7 @@ https://stackoverflow.com/questions/37966552/what-is-the-difference-between-dock
 
 ### Database Service
 
-From *docker-compose.yml*:
+From *docker-compose.yml* within "locations-db":
 
 ```yaml
 locations-db:
@@ -427,7 +432,7 @@ What's next?
 
 1. [Developing and Testing Microservices With Docker](http://mherman.org/blog/2017/04/18/developing-and-testing-microservices-with-docker)
 1. [Developing Microservices - Node, React, and Docker](http://mherman.org/blog/2017/05/11/developing-microservices-node-react-docker)
-1. [Microservices with Docker, Flask, and React](http://testdriven.io/)
+1. [Microservices with Docker, Flask, and React](http://testdriven.io/) - *[testdriven.io](http://testdriven.io/)*
 1. [Developing React with Docker](http://mherman.org/node-workshop/slides/react-docker)
 
 --
